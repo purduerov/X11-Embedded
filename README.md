@@ -6,3 +6,5 @@ Expands on V1 by fixing the way we intearct with the ESC's. Namely, it is meant 
 -solenoid runs only off of GPIO's
 
 -ESC's only run from stall to full forward i.e. 0-127 with 0 being stall and 127 being full forward
+
+-Only use the one's named (rebuild) any other has known issues
