@@ -139,14 +139,34 @@ int main(void)
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4);
 
-  nano_wait(60000000);
+  nano_wait(200000000);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
+  TIM3->CCR1 = 115;
+  TIM3->CCR2 = 115;
+  TIM3->CCR3 = 115;
+  TIM3->CCR4 = 115;
 
+  nano_wait(60000000);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
+  TIM3->CCR1 = 95;
+  TIM3->CCR2 = 95;
+  TIM3->CCR3 = 95;
+  TIM3->CCR4 = 95;
+
+  nano_wait(60000000);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
+  TIM3->CCR1 = 75;
+  TIM3->CCR2 = 75;
+  TIM3->CCR3 = 75;
+  TIM3->CCR4 = 75;
+
+  nano_wait(60000000);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
   TIM3->CCR1 = 55;
   TIM3->CCR2 = 55;
   TIM3->CCR3 = 55;
   TIM3->CCR4 = 55;
 
-  nano_wait(60000000);
 
   if (HAL_CAN_Receive_IT(&hcan, CAN_FIFO0) != HAL_OK)
   {
@@ -159,8 +179,8 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
+
 	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_15);
 	  nano_wait(10000000);
   }
@@ -324,8 +344,6 @@ static void MX_CAN_Init(void)
 
   if (HAL_CAN_ConfigFilter(&hcan, &sFilterConfig) != HAL_OK)
   {
-      int state = HAL_CAN_GetState(&hcan);
-      int error = HAL_CAN_GetError(&hcan);
       Error_Handler();
   }
 
@@ -374,7 +392,7 @@ static void MX_TIM3_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 95;
+  sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
@@ -437,7 +455,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 {
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
 	//If ID is correct and the amount of data being sent is four bytes, converts that data into PWM signals
-	if((hcan->pRxMsg->StdId == 0x203))
+	if((hcan->pRxMsg->StdId == 0x201))
 	{
 		TIM3->CCR1 = byte_to_pwm((int)hcan->pRxMsg->Data[7]); //U7
 		TIM3->CCR2 = byte_to_pwm((int)hcan->pRxMsg->Data[6]); //U2
