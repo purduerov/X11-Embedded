@@ -128,14 +128,6 @@ int main(void)
   /* USER CODE BEGIN 2 */
   //turns on PA10 in order to convert to 5V logic then clears shift registers
   //also sets G (PB0) to always be low
-  /*
-  for(;;)
-  {
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
-	  //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_15);
-	  nano_wait(1000000);
-  }
-  */
   if(SPI_USE == 1)
   {
 	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
@@ -146,12 +138,12 @@ int main(void)
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
   }
 
-  /*
+
   if (HAL_CAN_Receive_IT(&hcan, CAN_FIFO0) != HAL_OK)
   {
 	  Error_Handler();
   }
-  */
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -159,8 +151,6 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_15);
-			nano_wait(10000000);
 
     /* USER CODE BEGIN 3 */
 
@@ -219,9 +209,9 @@ static void MX_CAN_Init(void)
   hcan.Instance = CAN;
   hcan.Init.Prescaler = 4;
   hcan.Init.Mode = CAN_MODE_NORMAL;
-  hcan.Init.SJW = CAN_SJW_1TQ;
-  hcan.Init.BS1 = CAN_BS1_13TQ;
-  hcan.Init.BS2 = CAN_BS2_2TQ;
+  hcan.Init.SJW = CAN_SJW_4TQ;
+  hcan.Init.BS1 = CAN_BS1_11TQ;
+  hcan.Init.BS2 = CAN_BS2_4TQ;
   hcan.Init.TTCM = DISABLE;
   hcan.Init.ABOM = ENABLE;
   hcan.Init.AWUM = ENABLE;
@@ -326,7 +316,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 	//If ID is correct and the amount of data being sent is four bytes, converts that data into PWM signals
 	if((hcan->pRxMsg->StdId == 0x204))
 	{
-		sol_byte = hcan->pRxMsg->Data[0];
+		sol_byte = hcan->pRxMsg->Data[7];
 		if((sol_byte & 0x01) == ((sol_byte>>4) & 0x01))
 		{
 			//do nothing since this cant happen

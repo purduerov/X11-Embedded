@@ -6,7 +6,7 @@
   ******************************************************************************
   ** This notice applies to any and all portions of this file
   * that are not between comment pairs USER CODE BEGIN and
-  * USER CODE END. Other portions of this file, whether 
+  * USER CODE END. Other portions of this file, whether
   * inserted by the user or by software development tools
   * are owned by their respective copyright owners.
   *
@@ -138,6 +138,15 @@ int main(void)
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4);
+
+  nano_wait(60000000);
+
+  TIM3->CCR1 = 55;
+  TIM3->CCR2 = 55;
+  TIM3->CCR3 = 55;
+  TIM3->CCR4 = 55;
+
+  nano_wait(60000000);
 
   if (HAL_CAN_Receive_IT(&hcan, CAN_FIFO0) != HAL_OK)
   {
@@ -365,7 +374,7 @@ static void MX_TIM3_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 75;
+  sConfigOC.Pulse = 95;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
@@ -430,10 +439,10 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 	//If ID is correct and the amount of data being sent is four bytes, converts that data into PWM signals
 	if((hcan->pRxMsg->StdId == 0x203))
 	{
-		TIM3->CCR1 = byte_to_pwm((int)hcan->pRxMsg->Data[0]); //U7
-		TIM3->CCR2 = byte_to_pwm((int)hcan->pRxMsg->Data[1]); //U2
-		TIM3->CCR3 = byte_to_pwm((int)hcan->pRxMsg->Data[2]); //U1
-		TIM3->CCR4 = byte_to_pwm((int)hcan->pRxMsg->Data[3]); //U3
+		TIM3->CCR1 = byte_to_pwm((int)hcan->pRxMsg->Data[7]); //U7
+		TIM3->CCR2 = byte_to_pwm((int)hcan->pRxMsg->Data[6]); //U2
+		TIM3->CCR3 = byte_to_pwm((int)hcan->pRxMsg->Data[5]); //U1
+		TIM3->CCR4 = byte_to_pwm((int)hcan->pRxMsg->Data[4]); //U3
 	}
   //necessary portion that restarts the CAN receiving
 	if (HAL_CAN_Receive_IT(hcan, CAN_FIFO0) != HAL_OK)
