@@ -43,7 +43,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+  volatile int check_error = 0;
+  volatile int check_state = 0;
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -109,7 +110,6 @@ static void nano_wait(int t) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -138,34 +138,22 @@ int main(void)
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4);
-
-  nano_wait(200000000);
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
-  TIM3->CCR1 = 115;
-  TIM3->CCR2 = 115;
-  TIM3->CCR3 = 115;
-  TIM3->CCR4 = 115;
-
+/*
   nano_wait(60000000);
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
-  TIM3->CCR1 = 95;
-  TIM3->CCR2 = 95;
-  TIM3->CCR3 = 95;
-  TIM3->CCR4 = 95;
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
+    TIM3->CCR1 = 95;
+    TIM3->CCR2 = 95;
+    TIM3->CCR3 = 95;
+    TIM3->CCR4 = 95;
+*/
+    nano_wait(30000000);
+    nano_wait(30000000);
 
-  nano_wait(60000000);
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
-  TIM3->CCR1 = 75;
-  TIM3->CCR2 = 75;
-  TIM3->CCR3 = 75;
-  TIM3->CCR4 = 75;
-
-  nano_wait(60000000);
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
-  TIM3->CCR1 = 55;
-  TIM3->CCR2 = 55;
-  TIM3->CCR3 = 55;
-  TIM3->CCR4 = 55;
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
+    TIM3->CCR1 = 75;
+    TIM3->CCR2 = 75;
+    TIM3->CCR3 = 75;
+    TIM3->CCR4 = 75;
 
 
   if (HAL_CAN_Receive_IT(&hcan, CAN_FIFO0) != HAL_OK)
@@ -180,9 +168,19 @@ int main(void)
   {
     /* USER CODE END WHILE */
     /* USER CODE BEGIN 3 */
-
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_15);
-	  nano_wait(10000000);
+    check_error = HAL_CAN_GetError(&hcan);
+	if(check_error == 0x8 || check_error == 0x10)
+	{
+		__HAL_CAN_RESET_HANDLE_STATE(&hcan);
+		  if (HAL_CAN_Receive_IT(&hcan, CAN_FIFO0) != HAL_OK)
+		  {
+			  Error_Handler();
+		  }
+		  check_error = 0;
+	}
+    check_state = HAL_CAN_GetState(&hcan);
+    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_15);
+    nano_wait(10000000);
   }
   /* USER CODE END 3 */
 }
@@ -455,7 +453,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 {
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
 	//If ID is correct and the amount of data being sent is four bytes, converts that data into PWM signals
-	if((hcan->pRxMsg->StdId == 0x201))
+	if((hcan->pRxMsg->StdId == 0x202))
 	{
 		TIM3->CCR1 = byte_to_pwm((int)hcan->pRxMsg->Data[7]); //U7
 		TIM3->CCR2 = byte_to_pwm((int)hcan->pRxMsg->Data[6]); //U2
@@ -467,7 +465,6 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 	{
 		Error_Handler();
 	}
-	nano_wait(10);
 }
 
 //a function that was used to test the PWM signals without the use of CAN
@@ -520,7 +517,6 @@ void Error_Handler(void)
 	while(1)
 	{
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
-		nano_wait(10000000);
 	}
   /* USER CODE END Error_Handler_Debug */
 }

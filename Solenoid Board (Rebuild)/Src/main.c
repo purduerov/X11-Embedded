@@ -61,6 +61,8 @@
 static CanTxMsgTypeDef        TxMessage;
 static CanRxMsgTypeDef        RxMessage;
 unsigned char sol_byte = 0;
+volatile int check_error = 0;
+volatile int check_state = 0;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -133,8 +135,19 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_15);
-	  //nano_wait(10000000);
+	    check_error = HAL_CAN_GetError(&hcan);
+		if(check_error == 0x8 || check_error == 0x10)
+		{
+			__HAL_CAN_RESET_HANDLE_STATE(&hcan);
+			  if (HAL_CAN_Receive_IT(&hcan, CAN_FIFO0) != HAL_OK)
+			  {
+				  Error_Handler();
+			  }
+			  check_error = 0;
+		}
+	    check_state = HAL_CAN_GetState(&hcan);
+	    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_15);
+	    nano_wait(10000000);
   }
   /* USER CODE END 3 */
 }
@@ -359,6 +372,7 @@ void Error_Handler(void)
 	while(1)
 	{
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
+		nano_wait(10000000);
 		nano_wait(10000000);
 	}
   /* USER CODE END Error_Handler_Debug */

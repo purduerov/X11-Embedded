@@ -1,8 +1,8 @@
-main.c:96:13:nano_wait	0	static
-main.c:447:5:byte_to_pwm	8	static
-main.c:474:6:CAN_Spoof	0	static
-main.c:483:7:HAL_ADC_ConvCpltCallback	16	static
-main.c:510:6:Error_Handler	8	static
-main.c:194:6:SystemClock_Config	80	static
-main.c:109:5:main	120	static
-main.c:454:6:HAL_CAN_RxCpltCallback	16	static
+main.c:97:13:nano_wait	0	static
+main.c:445:5:byte_to_pwm	8	static
+main.c:471:6:CAN_Spoof	0	static
+main.c:480:7:HAL_ADC_ConvCpltCallback	16	static
+main.c:507:6:Error_Handler	16	static
+main.c:192:6:SystemClock_Config	80	static
+main.c:110:5:main	120	static
+main.c:452:6:HAL_CAN_RxCpltCallback	16	static
