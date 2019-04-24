@@ -126,6 +126,7 @@ int main(void)
   {
 	  Error_Handler();
   }
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -145,9 +146,6 @@ int main(void)
 			  }
 			  check_error = 0;
 		}
-	    check_state = HAL_CAN_GetState(&hcan);
-	    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_15);
-	    nano_wait(10000000);
   }
   /* USER CODE END 3 */
 }
@@ -288,7 +286,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 {
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
 	//If ID is correct and the amount of data being sent is four bytes, converts that data into PWM signals
 	if((hcan->pRxMsg->StdId == 0x204))
 	{
@@ -319,35 +317,35 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET); //GPIO 5 RESET
 				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET); //GPIO 6 RESET
 				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET); //GPIO 7 RESET
-				if((sol_byte & 0x01) == 0x01)
+				if((sol_byte & 0x80) == 0x80)
 				{
 					HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET); //GPIO 0 SET
 				}
-				if((sol_byte & 0x02) == 0x02)
+				if((sol_byte & 0x40) == 0x40)
 				{
 					HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET); //GPIO 1 SET
 				}
-				if((sol_byte & 0x04) == 0x04)
+				if((sol_byte & 0x20) == 0x20)
 				{
 					HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET); //GPIO 2 SET
 				}
-				if((sol_byte & 0x08) == 0x08)
+				if((sol_byte & 0x10) == 0x10)
 				{
 					HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET); //GPIO 3 SET
 				}
-				if((sol_byte & 0x10) == 0x10)
+				if((sol_byte & 0x08) == 0x08)
 				{
 					HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET); //GPIO 4 SET
 				}
-				if((sol_byte & 0x20) == 0x20)
+				if((sol_byte & 0x04) == 0x04)
 				{
 					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET); //GPIO 5 SET
 				}
-				if((sol_byte & 0x40) == 0x40)
+				if((sol_byte & 0x02) == 0x02)
 				{
 					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET); //GPIO 6 SET
 				}
-				if((sol_byte & 0x80) == 0x80)
+				if((sol_byte & 0x01) == 0x01)
 				{
 					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET); //GPIO 7 SET
 				}
@@ -371,9 +369,8 @@ void Error_Handler(void)
   /* User can add his own implementation to report the HAL error return state */
 	while(1)
 	{
-		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
-		nano_wait(10000000);
-		nano_wait(10000000);
+	    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_15);
+	    nano_wait(10000000);
 	}
   /* USER CODE END Error_Handler_Debug */
 }
